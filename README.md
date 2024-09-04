@@ -1,79 +1,43 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ตัวอย่างการใช้งาน FlatList ใน React Native
 
-# Getting Started
+โปรเจกต์นี้เป็นตัวอย่างการใช้งาน `FlatList` ใน React Native สำหรับแสดงรายการผู้ใช้ โดย `FlatList` ถูกตั้งค่าให้รองรับการเลื่อนหน้าจอเพื่อโหลดข้อมูลเพิ่มเติมแบบไม่สิ้นสุด และมีตัวบ่งชี้การโหลดข้อมูลที่ด้านล่างของรายการ
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## คุณสมบัติ
 
-## Step 1: Start the Metro Server
+- แสดงรายการผู้ใช้พร้อมคีย์เฉพาะสำหรับแต่ละรายการ
+- รองรับการเลื่อนหน้าจอเพื่อโหลดข้อมูลเพิ่มเติมเมื่อผู้ใช้เลื่อนไปถึงจุดสิ้นสุดของรายการ
+- สามารถกำหนดคอมโพเนนต์ Footer เพื่อแสดงตัวบ่งชี้การโหลดข้อมูลขณะที่กำลังดึงข้อมูลเพิ่มเติม
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## ภาพรวมของ Props ที่ใช้ใน FlatList
 
-To start Metro, run the following command from the _root_ of your React Native project:
+ด้านล่างนี้เป็นภาพรวมของ `props` ที่สำคัญที่ใช้ในคอมโพเนนต์ `FlatList`:
 
-```bash
-# using npm
-npm start
+### `data`
 
-# OR using Yarn
-yarn start
-```
+- **ประเภท:** `Array`
+- **คำอธิบาย:** `data` เป็น prop ที่ใช้ส่งข้อมูลที่ต้องการแสดงในลิสต์ โดยในตัวอย่างนี้ `users` คืออาเรย์ที่มีข้อมูลของผู้ใช้ (`ResultUser`) ที่จะถูกแสดงในรายการ
 
-## Step 2: Start your Application
+### `renderItem`
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+- **ประเภท:** `(item: ListRenderItemInfo<ResultUser>) => JSX.Element`
+- **คำอธิบาย:** ฟังก์ชันที่ใช้ในการกำหนดวิธีการแสดงแต่ละรายการ (`item`) ใน `FlatList` ฟังก์ชันนี้จะรับข้อมูลรายการเดียวและเรนเดอร์ออกมาในรูปแบบของ JSX
 
-### For Android
+### `keyExtractor`
 
-```bash
-# using npm
-npm run android
+- **ประเภท:** `(item: ResultUser) => string`
+- **คำอธิบาย:** ฟังก์ชันที่ใช้ในการระบุค่าคีย์ (key) สำหรับแต่ละรายการในลิสต์ โดยในตัวอย่างนี้จะใช้ `email` ของผู้ใช้เป็นคีย์ ซึ่งจะช่วยให้ React จัดการรายการในลิสต์ได้อย่างมีประสิทธิภาพ
 
-# OR using Yarn
-yarn android
-```
+### `ListFooterComponent`
 
-### For iOS
+- **ประเภท:** `React.ComponentType<any> | React.ReactElement | null`
+- **คำอธิบาย:** prop นี้ใช้กำหนดคอมโพเนนต์ที่จะถูกแสดงที่ส่วนล่างของลิสต์ (footer) ในตัวอย่างนี้จะใช้ `renderLoader` ซึ่งสามารถเป็นตัวบ่งชี้การโหลดข้อมูล (เช่น สปินเนอร์) หรือคอมโพเนนต์อื่น ๆ ตามที่ต้องการ
 
-```bash
-# using npm
-npm run ios
+### `onEndReached`
 
-# OR using Yarn
-yarn ios
-```
+- **ประเภท:** `() => void`
+- **คำอธิบาย:** ฟังก์ชันที่จะถูกเรียกใช้เมื่อผู้ใช้เลื่อนมาถึงจุดสิ้นสุดของลิสต์ โดยในตัวอย่างนี้จะเรียกใช้ฟังก์ชัน `loadMoreItem` เพื่อโหลดข้อมูลเพิ่มเติมเข้ามาในลิสต์
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+### `onEndReachedThreshold`
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- **ประเภท:** `number`
+- **คำอธิบาย:** กำหนดค่าจุดที่ฟังก์ชัน `onEndReached` จะถูกเรียกใช้ โดยในตัวอย่างนี้กำหนดเป็น `0` หมายความว่าฟังก์ชันจะถูกเรียกเมื่อเลื่อนมาถึงจุดสิ้นสุดของลิสต์พอดี
