@@ -1,117 +1,110 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  StatusBar,
+  SafeAreaView,
+  ListRenderItemInfo,
 } from 'react-native';
+import axios from 'axios';
+import { ResultUser } from './user-type';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
+  const [users, setUsers] = useState<ResultUser[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const getUsers = async() => {
+    try {
+      setIsLoading(true);
+      const response:any =await axios.get(
+        `https://randomuser.me/api/?page=${currentPage}&results=10`,
+      );
+      setUsers([...users, ...response.data.results]);
+      setIsLoading(false);
+    } catch (error) {
+    } finally {
+    }
   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+  const renderItem = ({item}:ListRenderItemInfo<ResultUser>) => {
+    return (
+      <View style={styles.itemWrapperStyle}>
+        <Image
+          style={styles.itemImageStyle}
+          source={{uri: item.picture.large}}
+        />
+        <View style={styles.contentWrapperStyle}>
+          <Text
+            style={
+              styles.txtNameStyle
+            }>{`${item.name.title} ${item.name.first} ${item.name.last}`}</Text>
+          <Text style={styles.txtEmailStyle}>{item.email}</Text>
         </View>
-      </ScrollView>
+      </View>
+    );
+  };
+
+  const renderLoader = () => {
+    return isLoading ? (
+      <View style={styles.loaderStyle}>
+        <ActivityIndicator size="large" color="#aaa" />
+      </View>
+    ) : null;
+  };
+
+  const loadMoreItem = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, [currentPage]);
+
+  return (
+    <SafeAreaView>
+      <StatusBar backgroundColor="#000" />
+      <FlatList
+        data={users}
+        renderItem={(item: ListRenderItemInfo<ResultUser>)=>renderItem(item)}
+        keyExtractor={item => item.email}
+        ListFooterComponent={renderLoader}
+        onEndReached={loadMoreItem}
+        onEndReachedThreshold={0}
+      />
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  itemWrapperStyle: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  itemImageStyle: {
+    width: 50,
+    height: 50,
+    marginRight: 16,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  contentWrapperStyle: {
+    justifyContent: 'space-around',
   },
-  highlight: {
-    fontWeight: '700',
+  txtNameStyle: {
+    fontSize: 16,
+  },
+  txtEmailStyle: {
+    color: '#777',
+  },
+  loaderStyle: {
+    marginVertical: 16,
+    alignItems: 'center',
   },
 });
 
